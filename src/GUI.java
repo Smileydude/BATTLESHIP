@@ -1,12 +1,13 @@
 	import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+	import java.awt.event.ActionEvent;
+	import java.awt.event.ActionListener;
+	import javax.swing.*;
 
 
 //state=true hit
 //state=false miss
 
-	class GUI extends JFrame {
+	class GUI extends JFrame implements ActionListener{
 
 		/**
 		 * 
@@ -25,7 +26,13 @@ import javax.swing.*;
 		private		ImageIcon		hit = new ImageIcon("hit.jpg");
 		private		ImageIcon		miss = new ImageIcon("miss.jpg");
 		private		ImageIcon		blank = new ImageIcon("blank.jpg");
-		private		ImageIcon		boat = new ImageIcon("boat.jpg");	
+		private		ImageIcon		ship = new ImageIcon("boat.jpg");	
+		private		usergrid	ugrid= new usergrid(size);
+		private		computergrid	cgrid = new computergrid(size);
+		private 	JTextField		text= new JTextField("Place ships on top left grid");
+
+
+		
 		
 
 		public GUI(){
@@ -84,7 +91,10 @@ import javax.swing.*;
 		    		}
 		    		else{
 		    		computerbuttons[i][j] = new JButton(water);
+		    		
 		    		Computer.add(computerbuttons[i][j]);
+		    		
+		    		computerbuttons[i][j].addActionListener(this);
 		    	}}
 		    }
 		    
@@ -123,6 +133,7 @@ import javax.swing.*;
 		    		}
 		    		else{
 		    		userbuttons[i][j] = new JButton(water);
+		    		userbuttons[i][j].addActionListener(this);
 		    		User.add(userbuttons[i][j]);
 		    	}}
 		    }
@@ -132,8 +143,9 @@ import javax.swing.*;
 		    Info = new JPanel();
 		    Info.setLayout( new BorderLayout() );
 		    
-		    Info.add( new JLabel( "Notes:" ), BorderLayout.NORTH );
-		    Info.add( new JTextArea(), BorderLayout.CENTER );
+		    
+		    Info.add( new JLabel( "Directions" ), BorderLayout.NORTH );
+		    Info.add( text, BorderLayout.CENTER );
 		}
 		
 		/**
@@ -142,22 +154,81 @@ import javax.swing.*;
 		 * @param x	(coordinate 1,2,3 etc...)
 		 * @param state (hit=true, miss=false)
 		 */
-		public void update(int y, int x,boolean state){
-			if (state){
-				userbuttons[x][y].setIcon(hit);
+		public void update(){
+			int[][] usergrid = ugrid.getGrid();
+			int[][] computergrid = cgrid.getGrid();
+			for (int i = 0; i<size-1;i++){
+				for (int j = 0; j<size-1;j++){
+					if (usergrid[i][j]==0){
+						userbuttons[i+1][j+1].setIcon(water);
+					}
+					if (usergrid[i][j]==1){
+						userbuttons[i+1][j+1].setIcon(water);
+					}
+					if (usergrid[i][j]==2){
+						userbuttons[i+1][j+1].setIcon(miss);
+					}
+					if (usergrid[i][j]==3){
+						userbuttons[i+1][j+1].setIcon(hit);
+					}
+					if (computergrid[i][j]==0){
+						computerbuttons[i+1][j+1].setIcon(water);
+					}
+					if (computergrid[i][j]==1){
+						computerbuttons[i+1][j+1].setIcon(ship);
+					}
+					if (computergrid[i][j]==2){
+						computerbuttons[i+1][j+1].setIcon(miss);
+					}
+					if (computergrid[i][j]==3){
+						computerbuttons[i+1][j+1].setIcon(hit);
+					}
 				}
-			else {
-				userbuttons[x][y].setIcon(miss);
 			}
 			
-		}
+			
+			
+				
+			}			
+		
 		
 		public void place(int x, int y){
-			computerbuttons[x][y].setIcon(boat);
-			
+			computerbuttons[x][y].setIcon(ship);
+		}
+
+		
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (int i = 1; i<size; i++){
+				for (int j = 1; j<size; j++){
+					if (e.getSource()==computerbuttons[i][j]){
+						cgrid.input(i-1, j-1);	
+						this.update();
+						break;
+					}
+					if (e.getSource()==userbuttons[i][j]){
+						ugrid.input(i-1, j-1);
+						this.update();
+						break;
+					}
+					}
+				}
 		}
 		
+		
+		
+	
+	}
+		
+		
+				
+			
+	        
+			
+		
+
 		
 		
 
-	}
+	
